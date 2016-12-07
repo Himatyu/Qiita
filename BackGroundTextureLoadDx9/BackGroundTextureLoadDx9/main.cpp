@@ -2,9 +2,10 @@
 #include "window.h"
 #include "Graphics.h"
 #include "Macro.h"
-#include<chrono>
 #include<vector>
-#include<iostream>
+#include<thread>
+#include<mutex>
+#include<chrono>
 #include<fstream>
 #include<string>
 #include<cmath>
@@ -16,6 +17,11 @@
 ID3DXSprite* pSprite;
 LPDIRECT3DDEVICE9 pDevice;
 D3DXMATRIX rotateMat;
+
+bool isLoaded = false;
+std::mutex isLoadedMutex;
+
+
 
 struct Texture
 {
@@ -77,6 +83,30 @@ void DrawTextureRotate(Texture _texture,float rot)
 
 }
 
+
+
+void SetLockFlag(bool _)
+{
+	std::lock_guard<std::mutex>  lock(isLoadedMutex);
+	isLoaded = true;
+}
+
+bool GetLockFlag()
+{
+	std::lock_guard<std::mutex>  lock(isLoadedMutex);
+	return isLoaded;
+}
+
+void AsyncLoad()
+{
+	auto sleepTime = std::chrono::seconds(10);
+	std::this_thread::sleep_for(sleepTime);
+
+	SetLockFlag(true);
+}
+
+
+
 int APIENTRY _tWinMain(
 	HINSTANCE _hInstance,
 	HINSTANCE _hPrevInstance,
@@ -93,14 +123,15 @@ int APIENTRY _tWinMain(
 	pDevice = graphics.Device;
 
 	auto texture = CreateTexture("loadImg.png", graphics);
-	D3DXCreateSprite(pDevice, &pSprite);
+	auto doneTexture = CreateTexture("doneTex.png", graphics);
 
+	D3DXCreateSprite(pDevice, &pSprite);
 	float angle = 0;
+	std::thread th = std::thread(AsyncLoad);
 
 
 	while (window.MessageProc())
 	{
-
 		pDevice->Clear
 		(0, NULL,
 			D3DCLEAR_TARGET | D3DCLEAR_STENCIL | D3DCLEAR_ZBUFFER,
@@ -108,8 +139,15 @@ int APIENTRY _tWinMain(
 			1.0f, 0
 		);
 
-		DrawTextureRotate(texture, angle);
-		angle += 0.001f;
+		if (!GetLockFlag())
+		{
+			angle += 0.001f;
+			DrawTextureRotate(texture, angle);
+		}
+		else
+		{
+			DrawTextureRotate(doneTexture, 0);
+		}
 
 		if (FAILED(pDevice->Present(NULL, NULL, NULL, NULL)))
 		{
@@ -117,6 +155,9 @@ int APIENTRY _tWinMain(
 		}
 
 	}
+	th.join();
+	SAFE_RELEASE(texture.pTexture);
+	SAFE_RELEASE(pSprite);
 
 	return 0;
 }
