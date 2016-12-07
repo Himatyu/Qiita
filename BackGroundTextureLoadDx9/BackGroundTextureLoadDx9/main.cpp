@@ -105,8 +105,6 @@ void AsyncLoad()
 	SetLockFlag(true);
 }
 
-
-
 int APIENTRY _tWinMain(
 	HINSTANCE _hInstance,
 	HINSTANCE _hPrevInstance,
@@ -127,6 +125,12 @@ int APIENTRY _tWinMain(
 
 	D3DXCreateSprite(pDevice, &pSprite);
 	float angle = 0;
+
+	auto count = std::thread::hardware_concurrency();
+	if (count < 3)
+	{
+		//Err
+	}
 	std::thread th = std::thread(AsyncLoad);
 
 
