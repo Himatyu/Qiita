@@ -6,111 +6,75 @@
 #include<vector>
 #include<iostream>
 #include<fstream>
+#include<string>
+#include<cmath>
 
 #pragma comment(lib,"winmm.lib")
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
 
-std::chrono::milliseconds LoadTexture(Graphics& graphics)
-{
-	IDirect3DTexture9*	pTexture[10];
-	auto pDevice = graphics.Device;
-	std::string path("tex1.jpg");
+ID3DXSprite* pSprite;
+LPDIRECT3DDEVICE9 pDevice;
+D3DXMATRIX rotateMat;
 
+struct Texture
+{
+	IDirect3DTexture9* pTexture;
 	D3DXIMAGE_INFO imageInfo;
-	D3DXGetImageInfoFromFile(path.c_str(), &imageInfo);
+};
 
-	std::chrono::milliseconds total = std::chrono::milliseconds::zero();
-
-	for (int i = 0; i < 10; i++)
-	{
-		auto start = std::chrono::system_clock::now();
-		D3DXCreateTextureFromFileEx
-		(
-			pDevice,
-			path.c_str(),
-			imageInfo.Width,
-			imageInfo.Height,
-			1,
-			0,
-			D3DFMT_A8R8G8B8,
-			D3DPOOL_DEFAULT,
-			D3DX_DEFAULT,
-			D3DX_DEFAULT,
-			0,
-			&imageInfo,
-			NULL,
-			&pTexture[i]
-		);
-		total +=
-			std::chrono::duration_cast<std::chrono::milliseconds>(
-				std::chrono::system_clock::now() - start);
-	}
-
-	for (int i = 0; i < 10; i++)
-	{
-		SAFE_RELEASE(pTexture[i]);
-	}
-
-	return total / 10;
-}
-std::chrono::milliseconds LoadTextureInMemory(Graphics& graphics)
+Texture CreateTexture(std::string _path, Graphics& _graphics)
 {
-	auto pDevice = graphics.Device;
-	std::string path("tex1.jpg");
+	Texture texture;
+	D3DXGetImageInfoFromFile(_path.c_str(), &texture.imageInfo);
+	auto pDevice = _graphics.Device;
 
-	std::vector<char> data;
-	std::fstream stream;
-	stream.open(path, std::ios::binary | std::ios::in);
+	D3DXCreateTextureFromFileEx
+	(
+		pDevice,
+		_path.c_str(),
+		texture.imageInfo.Width,
+		texture.imageInfo.Height,
+		1,
+		0,
+		D3DFMT_A8R8G8B8,
+		D3DPOOL_DEFAULT,
+		D3DX_DEFAULT,
+		D3DX_DEFAULT,
+		0,
+		&texture.imageInfo,
+		NULL,
+		&texture.pTexture
+	);
 
-	stream.seekg(0, std::ios::end);
-	auto tell = stream.tellg();
-	stream.clear();
-	stream.seekg(0, std::ios::beg);
-	auto head = stream.tellg();
+	return texture;
+}
 
-	auto size = tell - head;
-	data.resize(size);
-	stream.read(data.data(), size);
-	stream.close();
+void DrawTextureRotate(Texture _texture,float rot)
+{ 
+	D3DXMatrixRotationZ(&rotateMat, D3DXToRadian(rot));
+	rotateMat._41 = _texture.imageInfo.Width *0.5f;
+	rotateMat._42 = _texture.imageInfo.Height *0.5f;
 
-	D3DXIMAGE_INFO imageInfo2;
-	D3DXGetImageInfoFromFileInMemory(data.data(), data.size(), &imageInfo2);
+	D3DXVECTOR3 Center(
+		_texture.imageInfo.Width *0.5f,
+		_texture.imageInfo.Height *0.5f,
+		0.0f);
 
-	IDirect3DTexture9*	pTexture[10];
-	std::chrono::milliseconds total = std::chrono::milliseconds::zero();
+	rot += 0.001f;
 
-	for (int i = 0; i < 10; i++)
-	{
-		auto start2 = std::chrono::system_clock::now();
-		D3DXCreateTextureFromFileInMemoryEx
-		(
-			pDevice,
-			data.data(),
-			data.size(),
-			imageInfo2.Width,
-			imageInfo2.Height,
-			1,
-			0,
-			D3DFMT_A8R8G8B8,
-			D3DPOOL_DEFAULT,
-			D3DX_DEFAULT,
-			D3DX_DEFAULT,
-			0,
-			&imageInfo2,
-			NULL,
-			&pTexture[i]
-		);
-		total +=
-			std::chrono::duration_cast<std::chrono::milliseconds>(
-				std::chrono::system_clock::now() - start2);
-	}
-	for (int i = 0; i < 10; i++)
-	{
-		SAFE_RELEASE(pTexture[i]);
-	}
+	pSprite->SetTransform(&rotateMat);
 
-	return total / 10;
+	pDevice->BeginScene();
+	pSprite->Begin(0);
+	pSprite->Draw(_texture.pTexture,
+		NULL,
+		&Center,
+		NULL,
+		0xffffffff);
+	pSprite->End();
+	pDevice->EndScene();
+
 }
 
 int APIENTRY _tWinMain(
@@ -126,10 +90,13 @@ int APIENTRY _tWinMain(
 
 	Graphics graphics;
 	graphics.Create(window.GetHwnd(), 500, 500, true);
-	auto pDevice = graphics.Device;
+	pDevice = graphics.Device;
 
-	auto t1 = LoadTexture(graphics);
-	auto t2 = LoadTextureInMemory(graphics);
+	auto texture = CreateTexture("loadImg.png", graphics);
+	D3DXCreateSprite(pDevice, &pSprite);
+
+	float angle = 0;
+
 
 	while (window.MessageProc())
 	{
@@ -141,12 +108,12 @@ int APIENTRY _tWinMain(
 			1.0f, 0
 		);
 
-
+		DrawTextureRotate(texture, angle);
+		angle += 0.001f;
 
 		if (FAILED(pDevice->Present(NULL, NULL, NULL, NULL)))
 		{
-			auto presntParams = graphics.PresentParameters;
-			pDevice->Reset(&presntParams);
+			//Err
 		}
 
 	}
