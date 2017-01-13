@@ -122,28 +122,6 @@ namespace Utility
 		using TypeList10 =
 		Utility::TypeList<T1, TypeList9<T2, T3, T4, T5, T6, T7, T8, T9, T10>>;
 
-#define ___TYPE_LIST1(t1)\
-	Utility::TypeList<t1,Utility::NullType>
-#define ___TYPE_LIST2(t1,t2)\
-	Utility::TypeList<t1,___TYPE_LIST1(t2)>
-#define ___TYPE_LIST3(t1,t2,t3)\
-	Utility::TypeList<t1,___TYPE_LIST2(t2,t3)>
-#define ___TYPE_LIST4(t1,t2,t3,t4)\
-	Utility::TypeList<t1,___TYPE_LIST3(t2,t3,t4)>
-#define ___TYPE_LIST5(t1,t2,t3,t4,t5)\
-	Utility::TypeList<t1,___TYPE_LIST4(t2,t3,t4,t5)>
-#define ___TYPE_LIST6(t1,t2,t3,t4,t5,t6)\
-	TypeList<t1,___TYPE_LIST5(t2,t3,t4,t5,t6)>
-#define ___TYPE_LIST7(t1,t2,t3,t4,t5,t6,t7)\
-	Utility::TypeList<t1,___TYPE_LIST6(t2,t3,t4,t5,t6,t7)>
-#define ___TYPE_LIST8(t1,t2,t3,t4,t5,t6,t7,t8)\
-	Utility::TypeList<t1,___TYPE_LIST7(t2,t3,t4,t5,t6,t7,t8)>
-#define ___TYPE_LIST9(t1,t2,t3,t4,t5,t6,t7,t8,t9)\
-	Utility::TypeList<t1,___TYPE_LIST8(t2,t3,t4,t5,t6,t7,t8,t9)>
-#define ___TYPE_LIST10(t1,t2,t3,t4,t5,t6,t7,t8,t9,t10)\
-	Utility::TypeList<t1,___TYPE_LIST9(t2,t3,t4,t5,t6,t7,t8,t9,t10)>
-
-
 	//-----------------------------------------------------------
 	// Length
 	//-----------------------------------------------------------
