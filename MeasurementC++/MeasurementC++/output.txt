@@ -1,0 +1,50 @@
+int 4
+unsigned int 4
+char 1
+unsigned char 1
+short 2
+unsigned short 2
+__int64 8
+bool 1
+float 4
+double 8
+
+int 4
+unsigned int 4
+char 1
+unsigned char 1
+short 2
+unsigned short 2
+__int64 8
+bool 1
+float 4
+double 8
+
+int * 4
+unsigned int * 4
+char * 4
+unsigned char * 4
+short * 4
+unsigned short * 4
+__int64 * 4
+bool * 4
+float * 4
+double * 4
+
+class std::list<int,class std::allocator<int> > 12
+class std::vector<int,class std::allocator<int> > 16
+class std::deque<double,class std::allocator<double> > 20
+class std::forward_list<double,class std::allocator<double> > 8
+class std::map<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,struct std::less<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > >,class std::allocator<struct std::pair<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const ,int> > > 12
+class std::unordered_map<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,struct std::hash<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > >,struct std::equal_to<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > >,class std::allocator<struct std::pair<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const ,int> > > 40
+class std::unordered_set<int,struct std::hash<int>,struct std::equal_to<int>,class std::allocator<int> > 40
+class std::array<int,8> 32
+
+class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > 28
+class std::shared_ptr<int> 8
+class std::function<void __cdecl(void)> 40
+struct std::chrono::system_clock 1
+class std::thread 8
+class std::mutex 48
+class std::type_index 4
+
