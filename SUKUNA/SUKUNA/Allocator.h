@@ -23,34 +23,47 @@
 namespace SUKUNA
 {
 	///実メモリポインタを持つ
-	class Mediator
+	struct Mediator
 	{
-	public:
-		Mediator() {}
-		~Mediator() {}
-
 		Mediator* next;
-	private:
-
+		void*	pMem;
 	};
 
 	///一時的なメモリ確保を行う
-	class IFront
+	class Front
 	{
 	public:
-		IFront() {}
-		~IFront() {}
+		Front()
+		{
+			pBuffer = &pFront;
+		}
+		~Front() {}
 
 		template<class T>
-		MemoryPointer<T> Allocate() { return MemoryPointer<T>(); }
+		MemoryPointer<T> Allocate()
+		{
+			return MemoryPointer<T>();
+		}
 
 		template<class T>
-		void Deallocate(MemoryPointer<T>) {}
+		void Deallocate(MemoryPointer<T> _pointer)
+		{
 
-		Mediator* GetMediators() { return nullptr; }
-		void FlipBuffer() {}
+		}
+
+		Mediator* GetMediators()
+		{
+			return *pBuffer;
+		}
+		void FlipBuffer()
+		{
+			pBuffer = (*pBuffer == pFront) ? &pBack : &pFront;
+		}
 
 	private:
+		Mediator** pBuffer;
+		Mediator* pFront;
+		Mediator* pBack;
 
 	};
 
@@ -73,6 +86,7 @@ namespace SUKUNA
 	template<class T>
 	class MemoryPointer
 	{
+		friend class
 	public:
 		MemoryPointer() {}
 		~MemoryPointer() {}
